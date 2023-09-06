@@ -4,9 +4,7 @@ class SessionsController < ApplicationController
   def create
     user = User.find_by(email: params[:email])
     if user&.authenticate(params[:password])
-      session[:user_id] = user.id
-      # Debug: Print the session contents to the logs
-      Rails.logger.debug(session.inspect)
+      cookies.signed[:user_id] = { value: user.id, httponly: true } # Set the session cookie
       render json: user, status: :ok
     else
       render json: { errors: ["Invalid email or password"] }, status: :unauthorized
